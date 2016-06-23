@@ -1,0 +1,82 @@
+
+
+
+<dom-module id="iris-carousel">
+  <template>
+    <style>
+      :host {
+        @apply(--layout-flex-auto);
+        @apply(--layout-vertical);
+      }
+      
+      #carousel {
+        @apply(--layout-flex-auto);
+      }
+      
+      .image {
+        overflow: hidden;
+        background-size: contain;
+        background-position: center;
+        background-repeat: no-repeat;
+        width: 100%;
+        height: 100%;
+      }
+      
+      neon-animatable {
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+    <content selector="source"></content>
+    <iris-settings-access id="settings"></iris-settings-access>
+
+    <neon-animated-pages id="carousel" selected="[[selected]]" entry-animation="[[entryAnimation]]" exit-animation="[[exitAnimation]]" entry-duration="[[entryDuration]]" exit-duration="[[exitDuration]]">
+      <template is="dom-repeat" items="[[imageSources]]">
+        <neon-animatable>
+          <div class="image" style$="background-image: url([[item]]);"></div>
+        </neon-animatable>
+      </template>
+    </neon-animated-pages>
+
+  </template>
+  <script>
+    Polymer({
+      is: 'iris-carousel',
+      properties: {
+        duration: {
+          type: Number,
+          value: 5000,
+          observer: 'setDuration'
+        }
+      },
+      setDuration() {
+        console.log(this.duration, this.int);
+        this.int && clearInterval(this.int);
+        this.int = setInterval(() => {
+          this.selected = (this.selected + 1) % (this.imageSources.length - 1);
+        }, this.duration);
+      },
+      ready() {
+        this.entryAnimation = 'slide-from-left-animation';
+        this.exitAnimation = 'slide-right-animation';
+        this.entryDuration = 1500;
+        this.exitDuration = 1500;
+
+        this.selected = 0;
+      },
+      attached() {
+        let settings = this.$.settings;
+        let data_server = settings.getItem('data_server');
+        let data_port = settings.getItem('data_port');
+        let data_host = 'http://' + (!!data_port ? data_server + ':' + data_port : data_server);
+
+        let urls = Polymer.dom(this).querySelectorAll('source')
+          .map((row) => {
+            return data_host + row.getAttribute('url');
+          });
+
+        this.set('imageSources', urls);
+      }
+    });
+  </script>
+</dom-module>
