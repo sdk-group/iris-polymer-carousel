@@ -4,7 +4,6 @@
 <link rel="import" href="../neon-animation/neon-animatable.html">
 <link rel="import" href="../neon-animation/neon-animations.html">
 
-
 <dom-module id="iris-carousel">
   <template>
     <style>
@@ -19,7 +18,7 @@
 
       .image {
         overflow: hidden;
-        background-size: cover;
+        background-size: contain;
         background-position: center;
         background-repeat: no-repeat;
         width: 100%;
@@ -30,6 +29,7 @@
         width: 100%;
         height: 100%;
       }
+
     </style>
     <content selector="source"></content>
     <iris-settings-access id="settings"></iris-settings-access>
@@ -56,7 +56,9 @@
       setDuration() {
         this.int && clearInterval(this.int);
         this.int = setInterval(() => {
-          this.selected = this.imageSources.length > 1 ? (this.selected + 1) % (this.imageSources.length - 1) : 0;
+          this.selected = this.imageSources.length > 1
+            ? (this.selected + 1) % (this.imageSources.length - 1)
+            : 0;
         }, this.duration);
       },
       ready() {
@@ -71,12 +73,13 @@
         let settings = this.$.settings;
         let data_server = settings.getItem('data_server');
         let data_port = settings.getItem('data_port');
-        let data_host = 'http://' + (!!data_port ? data_server + ':' + data_port : data_server);
+        let data_host = 'http://' + (!!data_port
+          ? data_server + ':' + data_port
+          : data_server);
 
-        let urls = Polymer.dom(this).querySelectorAll('source')
-          .map((row) => {
-            return data_host + row.getAttribute('url');
-          });
+        let urls = Polymer.dom(this).querySelectorAll('source').map((row) => {
+          return data_host + row.getAttribute('url');
+        });
 
         this.set('imageSources', urls);
       }
